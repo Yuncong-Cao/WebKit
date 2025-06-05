@@ -381,7 +381,6 @@ platform/Widget.cpp
 platform/animation/AcceleratedEffect.cpp
 platform/cocoa/VideoPresentationModelVideoElement.mm
 platform/graphics/GraphicsLayer.cpp
-platform/graphics/SystemFallbackFontCache.cpp
 platform/graphics/ca/GraphicsLayerCA.cpp
 platform/graphics/ca/PlatformCALayer.mm
 platform/graphics/ca/cocoa/PlatformCALayerCocoa.mm
@@ -475,7 +474,6 @@ rendering/RenderTable.cpp
 rendering/RenderTableCaption.cpp
 rendering/RenderTableCell.cpp
 rendering/RenderTableCellInlines.h
-rendering/RenderTableCol.cpp
 rendering/RenderTableRow.cpp
 rendering/RenderTableSection.cpp
 rendering/RenderText.cpp

@@ -4547,6 +4547,35 @@ TEST_P(GLSLTest_ES31, FindMSBAndFindLSBCornerCases)
     EXPECT_PIXEL_COLOR_EQ(0, 0, GLColor::green);
 }
 
+// Test that a comma expression does not add any redundant statements
+// during shader translation rewrite steps. The test will verify the
+// correct color is drawn as a result of the called functions being
+// executed in the correct order and only once each.
+TEST_P(GLSLTest, CommaTestNoRedundantStatements)
+{
+    const char kFS[] = R"(
+precision mediump float;
+int g = 1;
+void F() { g *= 3; }
+void G() { g += 5; }
+void main() {
+    F(), G();
+    if (g == 8)
+    {
+        gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    }
+    else
+    {
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+})";
+
+    ANGLE_GL_PROGRAM(program, essl1_shaders::vs::Simple(), kFS);
+    drawQuad(program, essl1_shaders::PositionAttrib(), 0.5f);
+    ASSERT_GL_NO_ERROR();
+    EXPECT_PIXEL_COLOR_EQ(0, 0, GLColor::green);
+}
+
 // Test that reading from a swizzled vector that is dynamically indexed succeeds.
 TEST_P(GLSLTest_ES3, ReadFromDynamicIndexingOfSwizzledVector)
 {
@@ -6834,6 +6863,64 @@ void main()
     GLint bLoc = glGetUniformLocation(program, "uni.b");
     ASSERT_NE(-1, bLoc);
     GLint sampLoc = glGetUniformLocation(program, "uni.samp");
+    ASSERT_NE(-1, sampLoc);
+
+    glUniform1i(bLoc, 1);
+
+    std::array<GLColor, 4> kGreenPixels = {
+        {GLColor::green, GLColor::green, GLColor::green, GLColor::green}};
+
+    GLTexture tex;
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 kGreenPixels.data());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    ASSERT_GL_NO_ERROR();
+
+    drawQuad(program, "position", 0.5f);
+    ASSERT_GL_NO_ERROR();
+
+    EXPECT_PIXEL_COLOR_EQ(0, 0, GLColor::green);
+}
+
+// Tests that extracting samplers from structs that are members of other structs
+// will not cause a error when accessing any fields (e.g., uni.b)
+// (This is a modification of the above test "SamplerInStructMemberIndexing").
+TEST_P(GLSLTest, SamplerInStructInStructMemberIndexing)
+{
+    const char kVertexShader[] = R"(attribute vec2 position;
+varying vec2 texCoord;
+void main()
+{
+    gl_Position = vec4(position, 0, 1);
+    texCoord = position * 0.5 + vec2(0.5);
+})";
+
+    const char kFragmentShader[] = R"(precision mediump float;
+struct S1 { sampler2D samp; };
+struct S2 { S1 s1; bool b; };
+uniform S2 uni;
+varying vec2 texCoord;
+void main()
+{
+    uni;
+    if (uni.b)
+    {
+        gl_FragColor = texture2D(uni.s1.samp, texCoord);
+    }
+    else
+    {
+        gl_FragColor = vec4(1, 0, 0, 1);
+    }
+})";
+
+    ANGLE_GL_PROGRAM(program, kVertexShader, kFragmentShader);
+    glUseProgram(program);
+
+    GLint bLoc = glGetUniformLocation(program, "uni.b");
+    ASSERT_NE(-1, bLoc);
+    GLint sampLoc = glGetUniformLocation(program, "uni.s1.samp");
     ASSERT_NE(-1, sampLoc);
 
     glUniform1i(bLoc, 1);

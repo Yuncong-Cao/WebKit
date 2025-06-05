@@ -581,7 +581,6 @@ platform/graphics/ca/TileCoverageMap.cpp
 platform/graphics/ca/TileGrid.cpp
 platform/graphics/ca/cocoa/WebTiledBackingLayer.mm
 platform/graphics/cg/CGSubimageCacheWithTimer.cpp
-platform/graphics/coretext/ComplexTextControllerCoreText.mm
 platform/ios/PlaybackSessionInterfaceIOS.mm
 platform/ios/WebAVPlayerController.mm
 platform/mac/PlaybackSessionInterfaceMac.mm
@@ -610,7 +609,6 @@ rendering/CounterNode.cpp
 rendering/EllipsisBoxPainter.cpp
 rendering/FixedTableLayout.cpp
 rendering/FloatingObjects.cpp
-rendering/GridMasonryLayout.cpp
 rendering/GridTrackSizingAlgorithm.cpp
 rendering/HitTestResult.cpp
 rendering/ImageQualityController.cpp
@@ -701,11 +699,8 @@ rendering/RenderTable.h
 rendering/RenderTableCaption.cpp
 rendering/RenderTableCell.cpp
 rendering/RenderTableCellInlines.h
-rendering/RenderTableCol.cpp
 rendering/RenderTableRow.cpp
-rendering/RenderTableRowInlines.h
 rendering/RenderTableSection.cpp
-rendering/RenderTableSectionInlines.h
 rendering/RenderText.cpp
 rendering/RenderText.h
 rendering/RenderTextControl.cpp
