@@ -43,6 +43,9 @@
 #include "NetworkProcess.h"
 #include "NetworkProcessProxyMessages.h"
 #include "NetworkStorageManagerMessages.h"
+#if ENABLE(PARKABLE_STRINGS)
+#include "NetworkParkableStringStorage.h"
+#endif
 #include "OriginQuotaManager.h"
 #include "OriginStorageManager.h"
 #include "ServiceWorkerStorageManager.h"
@@ -2274,6 +2277,54 @@ std::optional<SharedPreferencesForWebProcess> NetworkStorageManager::sharedPrefe
 
     return iter->value;
 }
+
+#if ENABLE(PARKABLE_STRINGS)
+
+void NetworkStorageManager::parkableStringStore(const WebCore::ClientOrigin& origin, String&& digest, Vector<uint8_t>&& compressedData, CompletionHandler<void(bool)>&& completionHandler)
+{
+    assertIsCurrent(workQueue());
+    
+    if (!m_parkableStringStorage)
+        m_parkableStringStorage = makeUnique<NetworkParkableStringStorage>();
+    
+    bool success = m_parkableStringStorage->storeCompressedString(origin, digest, compressedData);
+    completionHandler(success);
+}
+
+void NetworkStorageManager::parkableStringRetrieve(const WebCore::ClientOrigin& origin, String&& digest, CompletionHandler<void(std::optional<Vector<uint8_t>>)>&& completionHandler)
+{
+    assertIsCurrent(workQueue());
+    
+    if (!m_parkableStringStorage) {
+        completionHandler(std::nullopt);
+        return;
+    }
+    
+    auto data = m_parkableStringStorage->retrieveCompressedString(origin, digest);
+    completionHandler(WTFMove(data));
+}
+
+void NetworkStorageManager::parkableStringDiscard(const WebCore::ClientOrigin& origin, String&& digest, CompletionHandler<void()>&& completionHandler)
+{
+    assertIsCurrent(workQueue());
+    
+    if (m_parkableStringStorage)
+        m_parkableStringStorage->discardString(origin, digest);
+    
+    completionHandler();
+}
+
+void NetworkStorageManager::parkableStringClearOrigin(const WebCore::ClientOrigin& origin, CompletionHandler<void()>&& completionHandler)
+{
+    assertIsCurrent(workQueue());
+    
+    if (m_parkableStringStorage)
+        m_parkableStringStorage->clearOrigin(origin);
+    
+    completionHandler();
+}
+
+#endif // ENABLE(PARKABLE_STRINGS)
 
 } // namespace WebKit
 

@@ -470,6 +470,7 @@ set(WTF_PUBLIC_HEADERS
     text/MakeString.h
     text/NullTextBreakIterator.h
     text/OrdinalNumber.h
+
     text/ParsingUtilities.h
     text/StringBuffer.h
     text/StringBuilder.h
@@ -661,6 +662,7 @@ set(WTF_SOURCES
     text/TextBreakIterator.cpp
     text/TextStream.cpp
     text/WTFString.cpp
+
 
     text/icu/UnicodeExtras.cpp
     text/icu/UTextProvider.cpp

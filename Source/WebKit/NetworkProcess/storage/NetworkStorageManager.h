@@ -92,6 +92,7 @@ enum class BackgroundFetchChange : uint8_t;
 enum class UnifiedOriginStorageLevel : uint8_t;
 class FileSystemStorageHandleRegistry;
 class IDBStorageRegistry;
+class NetworkParkableStringStorage;
 class NetworkProcess;
 class ServiceWorkerStorageManager;
 class StorageAreaBase;
@@ -249,6 +250,12 @@ private:
     void cacheStorageClearMemoryRepresentation(const WebCore::ClientOrigin&, CompletionHandler<void()>&&);
     void cacheStorageRepresentation(CompletionHandler<void(const String&)>&&);
 
+    // Message handlers for ParkableStrings.
+    void parkableStringStore(const WebCore::ClientOrigin&, String&& digest, Vector<uint8_t>&& compressedData, CompletionHandler<void(bool)>&&);
+    void parkableStringRetrieve(const WebCore::ClientOrigin&, String&& digest, CompletionHandler<void(std::optional<Vector<uint8_t>>)>&&);
+    void parkableStringDiscard(const WebCore::ClientOrigin&, String&& digest, CompletionHandler<void()>&&);
+    void parkableStringClearOrigin(const WebCore::ClientOrigin&, CompletionHandler<void()>&&);
+
     void cloneSessionStorageNamespace(StorageNamespaceIdentifier, StorageNamespaceIdentifier);
     bool shouldManageServiceWorkerRegistrationsByOrigin();
     void migrateServiceWorkerRegistrationsToOrigins();
@@ -325,6 +332,9 @@ private:
     using ConnectionSitesMap = HashMap<IPC::Connection::UniqueID, HashSet<WebCore::RegistrableDomain>>;
     std::optional<ConnectionSitesMap> m_allowedSitesForConnections WTF_GUARDED_BY_CAPABILITY(workQueue());
     HashMap<IPC::Connection::UniqueID, SharedPreferencesForWebProcess> m_preferencesForConnections WTF_GUARDED_BY_CAPABILITY(workQueue());
+#if ENABLE(PARKABLE_STRINGS)
+    std::unique_ptr<NetworkParkableStringStorage> m_parkableStringStorage WTF_GUARDED_BY_CAPABILITY(workQueue());
+#endif
 };
 
 } // namespace WebKit

@@ -59,6 +59,11 @@
     RemoveItem(WebKit::StorageAreaIdentifier identifier, WebKit::StorageAreaImplIdentifier implIdentifier, String key, String urlString) -> (bool hasError, HashMap<String, String> allItems)
     Clear(WebKit::StorageAreaIdentifier identifier, WebKit::StorageAreaImplIdentifier implIdentifier, String urlString) -> ()
 
+    ParkableStringStore(struct WebCore::ClientOrigin origin, String digest, Vector<uint8_t> compressedData) -> (bool success)
+    ParkableStringRetrieve(struct WebCore::ClientOrigin origin, String digest) -> (std::optional<Vector<uint8_t>> data)
+    ParkableStringDiscard(struct WebCore::ClientOrigin origin, String digest) -> ()
+    ParkableStringClearOrigin(struct WebCore::ClientOrigin origin) -> ()
+
     [EnabledBy=IndexedDBAPIEnabled] OpenDatabase(WebCore::IDBOpenRequestData requestData)
     [EnabledBy=IndexedDBAPIEnabled] OpenDBRequestCancelled(WebCore::IDBOpenRequestData requestData)
     [EnabledBy=IndexedDBAPIEnabled] DeleteDatabase(WebCore::IDBOpenRequestData requestData)

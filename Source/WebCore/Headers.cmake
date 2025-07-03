@@ -2556,6 +2556,10 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/sql/SQLiteTransaction.h
 
     platform/text/BidiContext.h
+    platform/text/DiskDataAllocator.h
+    platform/text/DiskDataMetadata.h
+    platform/text/ParkableString.h
+    platform/text/ParkableStringManager.h
     platform/text/PlatformLocale.h
     platform/text/StringWithDirection.h
     platform/text/TextBoundaries.h
